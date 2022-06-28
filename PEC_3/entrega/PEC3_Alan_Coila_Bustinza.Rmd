@@ -1,0 +1,375 @@
+---
+title: "PEC 3 Resolución de sistemas lineales"
+author: "Alan Coila Bustinza"
+
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-03-11'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Resolución numérica de sistemas de ecuaciones lineales
+
+# 1.  Métodos numéricos directos
+
+Comenzamos creando las variablee A y b, que contendran las matrices que nos plantea el ejercicio
+
+```{r}
+# Asignamos a la variable A la matriz que plantea el problema
+A <- matrix(c(1,2,-2,-1,1,0,-3,1,2,2,2,-2,-4,2,7,3,-3,-1,5,9,0,0,0,0,2), ncol = 5, 
+            byrow=TRUE)
+# Asignamos a la varible b la matriz correspondiente
+b<-matrix(c(-2,3,-3,13,2),byrow=FALSE)
+```
+Primero debemos corroborar que la matriz A es invertible o no singular, esto lo descartamos calculado su determinante el cual debe ser no nulo.
+```{r}
+# calculamos su determinante con la función det()
+det(A)
+```
+La martriz A tiene un determinante diferente de 0 por lo que podemos continuar la tarea de resolver de sistemas de ecuaciones lineales. 
+El método de factorización LU, plantea que mediante  la obtención de dos matrices triangulares, una inferior L(lower) con "1" en su diagonal y una superior U (upper).
+
+$$
+A=LU
+$$
+De manera que podemos resolver el sistema reemplazando
+
+$$
+\begin{aligned}
+Ax&=b\\ 
+LUx&=b
+\end{aligned}
+$$
+De donde obtenemos dos identidades:
+
+$$
+\begin{split}
+Ux=y
+\quad
+\quad
+Ly=b
+\end{split}
+$$
+
+A partir de de estas podemos resolver el sistema de ecuaciones
+
+Para ello instalamos e importamos el paquete pracma
+
+```{r}
+install.packages("pracma")
+library(pracma)
+```
+De este paquete, usaremos la función lu() que recibe como argumentos, una matriz y el argumento scheme qu
+
+```{r}
+# realizamos la factorizacion mediante la función lu y asignamos 
+# las variables correspondientes
+mlu<-lu(A, scheme='ijk') # metodo de Doolittle
+
+#lu() retorna dos matrices Lower y Upper, que almacenamos en  y U
+L<-mlu$L 
+U<-mlu$U
+
+```
+
+```{r, echo=FALSE}
+# Creamos un funcion auxiliar para esbrir la funcion
+write_matex2 <- function(x) {
+  begin <- "\\begin{bmatrix}"
+  end <- "\\end{bmatrix}"
+  X <-
+    apply(x, 1, function(x) {
+      paste(
+        paste(x, collapse = "&"),
+        "\\\\"
+      )
+    })
+  paste(c(begin, X, end), collapse = "")
+}
+```
+Reemplazamos los valores que hemos obtenidoen las ecuaciones previas. Asi obtener dos nuevos sistemas de ecuaciones con el cual resolver el sistema original.
+$$
+\begin{split}
+\begin{aligned}
+Ux&=y\\
+`r write_matex2(mlu$U)`
+\begin{bmatrix}
+x_1 \\
+x_2\\
+x_3\\
+x_4\\
+x_5\\
+\end{bmatrix} &= \begin{bmatrix}
+y_1 \\
+y_2\\
+y_3\\
+y_4\\
+y_5\\
+\end{bmatrix}
+\\
+\\
+x_1+2x_2-2x_3-x_4+x_5&=y_1\\
+-3x_2+x_3+2x_4+2x_5&=y_2\\
+-2x_3+x_5&=y_3\\
+2x_4+x_5&=y_4\\
+2x_5&=y_5\\
+\end{aligned}
+\end{split}
+\quad
+\quad
+\quad
+\begin{split}
+\begin{aligned}
+Ly&=b\\
+`r write_matex2(mlu$L)`\begin{bmatrix}
+y_1 \\
+y_2\\
+y_3\\
+y_4\\
+y_5\\
+\end{bmatrix} &= `r write_matex2(b)`
+\\
+\\
+y_1&=-2\\
+y_2&= 3\\
+2y_1+2y_2+y_3&=-3\\
+3y_1+3y_2-y_3+y_4&= 13\\
+y_5&= 2
+\end{aligned}
+\end{split}
+$$
+
+Para resolver ambos sistemas usaremos la funcion solve()
+
+```{r}
+y = solve(L,b) #Ly = b
+x = solve(U,y) #Ux = y
+x
+```
+
+Comprobamos que obtenemos el mismo resultado, resolviendo de forma directa con solve
+```{r}
+x_ = solve(A,b) #Ax_ = b
+x_
+```
+# 1.2. Metodos numéricos iterativos
+
+Construimos la matriz del problema, para la resolucion de ambos metodos, asi como tambien las matrices auxiliares triangulares y diagonales
+
+```{r}
+n = 10 #dimension del sistema
+
+A = diag(n) #construimos la matriz A, primero añadiendo los elementos de su diagonal
+
+for(i in 1:n-1) { A[i,i+1]<--1/2 } #ahora añadimos los elementos superiores e inferiores
+for(i in 1:n) { A[i,i-1]<-1/2 }
+```
+
+```{r}
+b = matrix(rep(0,n))
+b[1,1]<-1/2
+
+```
+
+```{r}
+D = diag(diag(A)) # creamos la matriz diagonal 
+L = -tril(A, -1) # ahora creamos la matriz trigangular superior e inferior con el signo cambiado
+U = -triu(A, 1)
+
+```
+## Pregunta 1 
+
+### Construcción de la matriz de Jacobi
+
+El metodo Jacobi que esta dada por:
+
+$$x^{k+1} = Jx^{k} + D^{-1}b$$
+Donde la matriz de Jacobi:
+$$ J = D^{-1}(L + U)$$
+
+
+```{r}
+J = inv(D)%*%(L+U) # mediante la inversa de la matriz D y el producto punto de la suma de las matrices L y U
+c = inv(D)%*%b 
+```
+
+### Convergencia
+
+Vamos a estudiar la convergencia para este sistema de ecuaciones mediante radio espectral, por lo cual calcularemos los autovalores  de J 
+
+```{r}
+lambda<-eigen(J)$values # mediante la funcion eigen obtenemos los autovalores
+lambda
+```
+
+Ahora obtendremos el maximo valor absoluto de los autovalores de J
+```{r}
+max_autovalor = max(abs(J))
+```
+Vemos que es menor que 1 por lo que concluimos que el metodo de Jacobi nos calcula una sucesion de iterantes que convergen en la solucion.
+
+## Pregunta 2 
+
+### Primera iteracion
+
+Considerando el iterante inicial $x^0 = (0,0,0,0,0,0,0,0,0,0)^t$ la primera iteracion seria: 
+
+```{r}
+x0=rep(0,n) #creamos el vector x0
+x1=J%*%x0+c # realizamos la primera iteracion
+x1
+```
+### Iteración de punto fijo $x^{k+1} = Jx^{k} + c$
+
+Empleamos el comando de R itersolve(A, b, x0, tol, method), cuyos argumentos son:
+A: la matriz del sistema
+b: el lado derecho del sistema
+x0: aproximacio inicial
+tol: condición de parada en base al error cometido
+method: metodo a utilizar ("Gauss-Seidel" o "Jacobi")
+
+Con esta funcion podremos calcular lo solicitado :
+
+las iteraciones para un error $10^{-6}$
+
+error = $10^{-6}$
+```{r}
+
+sol = itersolve(A, b, x0,  tol = 1e-6, method = "Jacobi")#solucion con un error de aproximacion maximo
+print(sol)
+
+```
+El numero de iteraciones es de `r sol$iter`
+
+El error cometido al realizar 80 iteraciones:
+
+```{r}
+sol1 = itersolve(A, b, x0, nmax = 8 , method = "Jacobi")#Soluci?n con un numero maximo de iteraciones
+print(sol1)
+```
+### Calculo del error relativo 
+
+Sabemos que el error se puede calcular a partir de $r=b-A\bar{x}$
+
+```{r}
+errorJ <- b-A%*%sol1$x # multiplicaremos la matriz A por el vector 
+                      #de la aproximacion obtenido con 80 iteraciones
+```
+Por lo que el error es `r max(errorJ)`
+
+### Comprobación
+
+Comprobamos que obtenemos el mismo resultado, resolviendo de forma directa con solve
+
+```{r}
+x_ = solve(A, b)
+x_
+```
+
+## Pregunta 3
+
+### Construcción de la matriz de Gauss-Seidel
+El metodo Jacobi que esta dada por:
+
+$$x^{k+1} = Gx^{k} + (D-L)^{-1}b$$
+Donde la matriz de Gauss-Seidel:
+$$ G = (D-L)^{-1}U$$
+
+Como previamente hemos creado las matrices comunes al metodo de Jacobi, unicamente crearemos las matrices necesarias
+
+```{r}
+M = D - L  #en este caso calculamos la matriz M como la diferencia de la matriz diagonal y la triangular inferior
+G = inv(M)%*%U # obtenemos la matriz de Gauss
+d = inv(M)%*%b 
+```  
+
+### Primera iteracion
+Considerando el iterante inicial $x^0 = (0,0,0,0,0,0,0,0,0,0)^t$ la primera iteracion seria: 
+
+```{r}
+x0=rep(0,n) #creamos el vector x0
+x1=G%*%x0+d # realizamos la primera iteracion
+x1
+```
+
+### Iteración de punto fijo $x^{k+1} = Gx^{k} + d$
+
+Utilizamos el mismo comando descrito previamente
+
+```{r}
+sol = itersolve(A, b, x0,  tol = 1e-6, method = "Gauss-Seidel")#solucion con un error de aproximacion maximo
+print(sol)
+sol1 = itersolve(A, b, x0, nmax = 80 , method = "Gauss-Seidel")#Soluci?n con un numero maximo de iteraciones
+print(sol1)
+```
+#### Calculo del error relativo.
+
+Sabemos que el error se puede calcular a partir de $r=b-A\bar{x}$
+
+```{r}
+errorG <- b-A%*%sol1$x # multiplicaremos la matriz A por el vector 
+                      #de la aproximacion obtenido con 80 iteraciones
+```
+Por lo que el error es `r max(errorG)`
+
+### Comprobación.
+
+Comprobamos que obtenemos el mismo resultado, resolviendo de forma directa con solve
+```{r}
+x_ = solve(A, b)
+x_
+```
+# Pregunta 4
+
+En general el metodo de Gauss-Seidel converge mas rápido que el de Jacobi al usar datos actualizados con cada iteracion, podemos comprobarloal realizar la iteraciones que para obtenre un error menor a $10^{-6}$, el metodo de Jacobi requiere 292 iteraciones mientras que el metodo de Gauss-Sediel requiere 141, la diferencia tambien puede observarse, por consecuencia, en el error.
+
+# Pregunta 5
+
+Para n=20
+
+
+```{r}
+
+n = 20
+A = diag(n)
+for(i in 1:n-1) { A[i,i+1]<--1/2 }
+for(i in 1:n) { A[i,i-1]<-1/2 }
+b = matrix(rep(0,n))
+b[1,1]<-1/2
+D = diag(diag(A)) 
+L = -tril(A, -1) 
+U = -triu(A, 1)
+x0 = rep(0,n)
+sol = itersolve(A, b, x0,  tol = 1e-6, method = "Jacobi")
+sol1 = itersolve(A, b, x0, nmax = 80 , method = "Jacobi")
+
+```
+Error para 80 iteraciones:`r max(b-A%*%sol1$x)`,
+Numero de iteraciones para error menos o igual a $10^{-6}$ : `r sol$iter`
+
+
+
+Para n=40
+
+
+```{r}
+
+n = 40
+A = diag(n)
+for(i in 1:n-1) { A[i,i+1]<--1/2 }
+for(i in 1:n) { A[i,i-1]<-1/2 }
+b = matrix(rep(0,n))
+b[1,1]<-1/2
+D = diag(diag(A)) 
+L = -tril(A, -1) 
+U = -triu(A, 1)
+x0 = rep(0,n)
+sol = itersolve(A, b, x0,  tol = 1e-6, method = "Jacobi")
+sol1 = itersolve(A, b, x0, nmax = 8 , method = "Jacobi")
+
+```
+Error para 40 iteraciones:`r max(b-A%*%sol1$x)`
+Numero de iteraciones para error menos o igual a $10^{-6}$ : `r sol$iter`

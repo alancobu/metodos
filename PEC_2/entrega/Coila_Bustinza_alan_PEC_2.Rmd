@@ -1,0 +1,169 @@
+---
+title: "Métodos Numéricos en Ciencia de Datos"
+subtitle: "PEC 2"
+author: "Alan Coila Bustinza"
+date: "3/3/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+# 1.1 Alternativa al cálculo de los coeficientes del polinomio característico
+
+## Definición de la matriz L
+
+Definimos la matriz L como en la PEC anterior
+ ```{r}
+L<-matrix(c(2,35,-36,-180,1,0,0,0,0,1,0,0,0,0,1,0),nrow=4,ncol=4,byrow=TRUE)
+L
+```
+## Orden de la matriz L
+
+El orden de la matriz es el número de filas y número de columnas que la componen. Podemos calcularlo mediante la funcion ***dim()***, esta retorna dos valores, al tratarse de un matriz cuadrada, solo necesitaremos el primer valor, lo almacenamos en la variable N
+```{r}
+N<-dim(L)[1]
+```
+Para obtener los coeficientes del polinomio característico: $P(\lambda)=\lambda^4+c_1\lambda^3+c_2\lambda^2+c_3\lambda+c_4$, haremos uso de la expresión $c_n=-\frac{1}{n}Tr(B_n)$ donde $B_N=L(B_{{n-1}}+c_{{n-1}}I)$.
+
+Necesitamos definir la matriz identidad.
+
+```{r}
+I<-diag(1,N) #Matriz identidad de dimension igual que L
+I
+```
+Ahora calcularemos los coeficientes del polinomio característico reemplazado los valores que tenemos en las expresiones correspondientes. Usaremos como en la PEC anterior las funciones anidadas ***sum(diag())*** para obtener la traza, teniendo cuidado en la multiplicación entre matrices y con un escalar.
+
+```{r}
+B1<-L
+c1<--sum(diag(B1))
+c1
+B2<-L%*%(B1 + c1*I) 
+c2<-(-0.5)*sum(diag(B2))
+c2
+B3<-L%*%(B2+c2*I)
+c3<-(-1/3)*sum(diag(B3))
+c3
+B4<-L%*%(B3+c3*I)
+c4<-(-0.25)*sum(diag(B4))
+c4
+```
+
+# 1.2 Tercera parte del algoritmo de Leverrier: Cálculo de los valores propios de L(I)
+
+
+Primero obtedremos los autovalores de mayor módulo, como se piden los valores de $a_n$ y $b_n$ para $3<=n<=20$, debemos calcular $s1, s2, ...,s20$. Si recordamos que  ***$s_n = Tr(L^n)$***, mediante una iteración podremos obtener las trazas.
+
+```{r}
+
+n=20 #definimos el numero iteraciones.
+Ln = diag(N) #creamos la matriz Ln , matriz identidad de orden igual al de L
+sn = 0 #definimos la variable que almacenara los valores de la iteración
+for(i in 1:n){
+  Ln =  Ln%*%L # Ln multiplicada por L
+  sn[i] = sum(diag(Ln)) #Traza de la matriz Ln
+}
+print(sn)
+```
+
+Utilizaremos las relaciones de Leverrier para calcular los valores propios, estan definidos mediante las siguientes fomulas:
+\begin{itemize}
+\item$\sigma_n=\frac{s_n}{s_{{n-1}}}, n\geq2$ con $\sigma = 0$ y \item$\delta_n=\frac{\sigma_n-\sigma_{n-1}}{\sigma_{n-1}-\sigma_{n-2}} , n\geq3$.
+\end{itemize}
+
+
+Por lo que calcularemos los valores de $\sigma$ de la sigueitne forma:
+
+```{r}
+sigma = c(0, 0) #inicializamos a cero el vector
+
+for(i in 2:length(sn)){ # iteramos dentro de la variable que almacena la 
+                        #suma de los valores propios de la matriz Ln
+  sigma[i] <- sn[i]/sn[i-1] #aplicamos la primera identidad y la almacenamos en la variable sigma
+}
+print(sigma)
+
+```
+Ahora haremos un cálculo similar para $\delta$
+
+```{r}
+delta = c(0, 0, 0)   #inicializamos a cero el vector
+for(i in 3:length(sigma)){    #iteramos de la misma forma que el bucle anterior
+  delta[i] = (sigma[i]-sigma[i-1])/(sigma[i-1]-sigma[i-2])
+}
+```
+
+A continuacion calculamos las sucesiones $a_n$ y $b_n$, que convergen a los valores propios de mayor móulo. Para ellos debemos resolver el siguiente sistema de ecuaciones: 
+
+\begin{itemize}
+\item $a_n+b_n=\sigma_n+\delta_n\sigma_{n-2}, n\geq3$
+\item $a_nb_n=\sigma_{n-1}\sigma_{n-2}\delta_n , n\geq3$
+\end{itemize}
+
+Creamos las sucesiones auxiliares $y_n=a_n+b_n$, y  $z_n=a_nb_n$.
+
+```{r}
+
+yn = c(0, 0, 0)
+zn = c(0, 0, 0)
+
+#para yn
+for (i in 3:n){
+  yn[i] = sigma[i] + (delta[i]*sigma[i-2])
+}
+
+#para zn
+for (i in 3:n){
+  zn[i] = sigma[i-1]*sigma[i-2]*delta[i]
+}
+```
+
+Los valores de $a_n$ y $b_n$ se obtienen al resolver la ecuacion: $x^2 - y_n[i]x + z_n[i]=0$ para cada uno de los valores de i. Usamos la funcion ***polyroot()***, esta devuelve valores complejos y nosotros nos quedamos con la parte real mediante al funcion ***Re()***.
+
+```{r}
+for (i in 3:n){
+  lambda = Re(polyroot(c(zn[i], -yn[i], 1)))
+  print(lambda)
+}
+lambda4 = lambda[1]
+lambda3 = lambda[2]
+
+```
+## 1.3 Cuarta parte del algoritmo de Leverrier: Cálculo de los valores propios de L(II)
+
+Ahora calcularemos los autovalores lambda1 y lambda2 de la matriz L. Utilizaremos la identidad:
+
+$$
+\begin{aligned}
+\frac{P(\lambda)}{(\lambda-a_20)(\lambda-b_20)}=& 0 \\
+\frac{\lambda^4+c_1\lambda^3+c_2\lambda^2+c_3\lambda+c_4}{\lambda^2-(a_{20}+b_{20})+a_{20}b_{20}}=& 0\\
+\end{aligned}
+$$
+
+
+
+Necesitaremos instalar la libreria "pracma"
+
+```{r}
+install.packages("pracma")
+library(pracma)
+```
+
+```{r}
+#Creamos los vectores correspondientes a los coeficientes del numerador y denominador.
+num = c(1, c1, c2, c3, c4)
+den = c(1, -(lambda[1] + lambda[2]), lambda[1]*lambda[2])
+
+div = deconv(num, den) #la función deconv() de la libreria "pracma" nos devuelve un polinomio 
+                        #cociente "q" y uno "r"
+print(div[[1]]) #imprimimos el polinomio cociente "q"
+```
+Calculamos las raices del polinomio obtenido
+
+```{r}
+lambda = Re(polyroot(c(rev(div[[1]]))))
+lambda2 = lambda[1]
+lambda1 = lambda[2]
+
+print(c(lambda4, lambda3, lambda2, lambda1))
+
+print(eigen(L)$values) #comparamos con las raices el ejercicio anterior
+```

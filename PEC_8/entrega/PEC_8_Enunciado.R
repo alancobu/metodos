@@ -1,0 +1,169 @@
+# Clear the workspace
+rm(list = ls())
+
+####### Funciones auxiliares #######
+source('Lectura_datos_por_fecha.R')
+
+# Contruccion de la matriz de los datos evaluados en las funciones base (Phi)
+myPhi = function(x, n){
+	
+	Phi = matrix(1, length(x), n+1)
+	for (i in 1:n) {
+		Phi[, i+1] = x^i# funciones base para el ajuste polinómico
+	}
+	return(Phi)
+	
+}
+
+# Función que resuelve el sistema de ecuaciones normales mediante la expresión (5) de la guía
+
+mylssolve = function(A, b){
+	
+	AT = t(A)# trasponer la matriz del sistema
+	return((solve(AT%*%A))%*%AT%*%b) # resolver el sistema
+	
+}
+
+# Función que realiza un ajuste lineal polinómico de grado "n". Devuelve los coeficientes del polinomio.
+mypolyfit = function(x, y, n){
+	
+	Phi = myPhi(x,n)
+	# print(Phi)# construir la matriz con myPhi
+	
+	c = mylssolve(Phi,y)# resolver el sistema de ecuaciones normales con mylssolve
+	return(c)
+	
+}
+
+# Función que evalúa un ajuste polinómico definido por los 
+# coeficientes "c" en los puntos "x" (que puede ser un vector de puntos)
+myeval = function(x, c){
+	
+	f = 0
+	for (i in 1:length(c)) {
+		f = f + c[i]*x^(i -1) # construir la aproximación lineal polinómica dados los coeficientes
+	}
+	return(f)
+}
+
+######### Ejercicio 1 ######### 
+## Lectura de los datos
+Y = myReadData_byDate('WHO-COVID-19-global-data-SPAIN.csv', '15/12/2020','01/02/2021', 'New_deaths') # Incluir fechas y etiqueta
+m = length(Y)
+X = 1:m# definir la variable que representa a los días
+
+# x1 <- matrix(X)
+# Y1 <- matrix(log(Y))
+# b <- (((t(X1)%*%X1)^-1)%*%t(X1))%*%(Y1)
+# y_h <- X1%*%b
+# Representación de los datos
+par(mfrow = c(1,1))
+plot(X, Y)
+
+## Implementar la técnica de linalización escogida
+
+Clog <- mypolyfit(X,log(Y),1)
+fLog <- exp(myeval(X,Clog))
+
+# Dado que la grafica que observamos es claramente no lineal, implementaremos una tranformacion
+# logaritmica de los datos, pues tienen tendencia exponencial, algo que es caracteristico en la
+# evolucion de las pandemias
+
+
+# (Código aquí)
+
+## Regresión lineal de grado 1
+CkP <- mypolyfit(X,Y,1) # obtener los coeficientes del ajuste lineal
+
+fL <- myeval(X,CkP)
+
+## Representación gráfica
+lines(X ,fLog , col='green', lwd=3) # técnica de linealización escogida
+lines(X, fL, col='red', lwd=3) # ajuste lineal
+
+## Cálculo del coeficiente de determinación para el modelo exponencial y polinómico de grado 1
+
+
+St = sum ( (Y - mean (Y))^2 )
+
+Sr_L = sum ( (Y - exp(myeval (X, Clog )))^2 )
+Sr_P = sum ( (Y - myeval (X, CkP ))^2 )
+
+r_L = (St - Sr_L)/St
+r_P = (St - Sr_P)/St
+
+
+# St = # discrepancias de los datos con respecto a la media
+# 
+# Sr_L = # sumatorio de los residuos para la técnica de linialización escogida
+# Sr_P = # sumatorio de los residuos para el ajuste lineal
+# 
+# r_L = # coeficiente de correlación para la técnica de linialización escogida
+# r_P = # coeficiente de correlación para el ajuste lineal
+print(r_L)
+print(r_P)
+
+## Predicción
+x15 = 15# determinar abscisa de la predicción
+y15_L = exp(myeval (x15, Clog ))# predicción mediante la técnica de linialización escogida
+y15_P = myeval (x15, CkP )# predicción mediante regresión lineal
+print(y15_L)
+print(y15_P)
+
+######### Ejercicio 2 ######### 
+## Lectura de los datos
+Y = myReadData_byDate('WHO-COVID-19-global-data-SPAIN.csv', '03/01/2020', '03/09/2021', 'Cumulative_cases') # Incluir fechas y etiqueta
+m = length(Y)
+X = 1:m# definir la variable que representa a los días
+
+# Representación de los datos
+plot(X, Y)
+
+## Obtención y representación de cada uno de los segmentos (en este caso se utilizan 7 segmentos)
+seg = 7# número de segmentos empleados
+groups <- split(X,cut(seq_along(X),seg,labels = FALSE))
+ini_segmentos = X[seq(1, length(X)-1, round(length(X)/seg,0))]# rellenar con los días de inicio de los segmentos
+fin_segmentos = X[seq(1, length(X), round(length(X)/seg,0))]-1
+Cks = matrix(0, 2, seg)
+# rellenar con los días de fin de los segmentoCks = matrix(0, 2, seg) # matriz que almacenará los coeficientes obtenidos para cada segmento
+
+for (i in 1:seg){ # bucle en segmentos
+	
+	# s = ini_segmentos[i]:fin_segmentos[i]
+	# print(s)
+	# 
+	Xs = unlist(groups[i], use.names = FALSE)
+	# seleccionar los días del segmento
+	Ys = Y[Xs]# seleccionar los datos del segmento
+	Cks[, i] = mypolyfit(Xs,Ys,1)# realizar un ajuste lineal y almacenar los coeficientes 
+	  # obtenidos para el segmento que se esta tratando en cada iteración
+	
+	# print(myeval(Xs,matrix(Cks[,i])))
+	lines( Xs, myeval(Xs,matrix(Cks[,i])), col='red', lwd=3)	# representar los segmentos
+	
+}
+
+## Comparación de la regresión linial con la regresión segmentada
+plot(X, Y)
+# Ajuste por regresión lineal (n=1) y representación
+# realizar un ajuste lineal
+
+Ck1 = mypolyfit(X,Y,1)
+G1 <- myeval(X,Ck1)
+lines(X,G1 , col='green', lwd=3) # representar el ajuste lineal
+
+# Ajuste por regresión lineal polinómica de grado 2 (n=2) y representación
+Ck2 <- mypolyfit(X,Y,2)
+G2 <- myeval(X,Ck2)# realizar un ajuste lineal polinómico de grado 2
+lines(X,G2 , col='magenta', lwd=3) # representar el ajuste lineal polinómico de grado 2
+
+## Puntos de corte de las rectas
+for (i in 1:seg-1){
+	
+ # obtener las componentes "x" (días) de los puntos de corte de las rectas de 
+# regresión obtenidas para dos segmentos consecutivos
+  xs =
+	print(xs)
+
+}
+

@@ -1,0 +1,111 @@
+---
+title: "Métodos Numéricos en Ciencia de Datos"
+subtitle: "PEC 1"
+author: "Alan Coila Bustinza"
+date: "22/2/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Métodos numéricos aplicados a los conceptos básicos del álgebra lineal
+## 1. Suma de las potencias de los valores propios de L
+### a. Introducir la matriz L
+<div style="text-align: justify"> Primero crearemos la matriz y la almacenaremos en la variable L, la función matriz acepta los argumentos:\
+<div style="text-align: justify">1. Los datos numéricos concatenados
+2. El argumento nrow indica el numero de filas  de la matriz
+3. El argumento ncol indica el numero de columnas de la matriz
+4. byrow nos permite indicar que los valores de primer argumento sean ingresado en nuestra matriz fila por fila
+  
+  ```{r}
+  L<-matrix(c(2,35,-36,-180,1,0,0,0,0,1,0,0,0,0,1,0),nrow=4,ncol=4,byrow=TRUE)
+  L
+  ```
+### b. Cálculo de los valores s1, s2, s3, s4
+  
+  
+Calculamos la traza de las potencias de la matriz L
+<div style="text-align: justify">Para ello utilizaremos la formula ***$s_n = Tr(L^n)$***, por lo que necesitaremos obtener las matrices ***$L^{n}$*** y el valor de su traza. La traza de una matriz es la suma de los elementos que se encuentran en su diagonal, por lo que podremos usar las funciones ***sum()*** y ***diag()*** . 
+Realizamos el cálculo de las trazas de la matriz L elevada a las diferentes potencias requiridas y obtenemos el valor de sus respectivas trazas. 
+
+```{r}
+L2 = L %*% L
+L3 = L2 %*% L
+L4 = L3 %*% L
+
+s1 = sum(diag(L))
+s2 = sum(diag(L2))
+s3 = sum(diag(L3))
+s4 = sum(diag(L4))
+```
+
+Ahora comparemos la igualdad con la formula de Leverrier ***$s_n=\lambda_1^n+\lambda_2^n+\lambda_3^n+\lambda_4^n$***, necesitaremos conseguir lo valores propios, elevarlos  a las respectivas potencias y almacenar su sumatoria.
+
+```{r}
+lambda <- eigen(L)$values
+s1_1 = sum(lambda)
+s2_1 = sum(lambda**2)
+s3_1 = sum(lambda**3)
+s4_1 = sum(lambda**4)
+```
+Comprobamos que los valores son iguales
+
+```{r}
+sprintf(paste(s1, s2,s3,s4))
+sprintf(paste(s1_1, s2_1,s3_1,s4_1))
+```
+## 2: Cálculo de los coeficientes del polinomio característico
+Calcularemos los coeficientes segun las igualdades de Leverrier.
+
+```{r}
+c1 = -s1
+c2 = (0.5)*(-s2 - c1*s1)
+c3 = (1/3)*(-s3 - c1*s2 - c2*s1)
+c4 = (0.25)*(-s4 - c1*s3 - c2*s2 - c3*s1)
+
+```
+De donde tenemos:
+```{r}
+sprintf(paste(c1, c2, c3, c4))
+
+```
+
+Por lo que el polinomio caracteristico es:
+
+$$
+\begin{aligned}
+P(\lambda)&=\lambda^4+c_1\lambda^3+c_2\lambda^2+c_3\lambda+c_4 \\
+& =\lambda^4+({`r c1`})\lambda^3+({`r c2`})\lambda^2+({`r c3`})\lambda+({`r c4`})\\
+& =\lambda^4{`r c1`}\lambda^3{`r c2`}\lambda^2+{`r c3`}\lambda+{`r c4`}
+\end{aligned}
+$$
+
+
+
+## 3: Matriz de compañia del polinomio característico.
+
+
+Sabemos que a cada polinomio caracteristico le corresponde una matriz de compañia, donde se cumple lo siguiente:
+
+
+$$
+\begin{aligned}
+&p(t)=c_{0}+c_{1}t+\cdots +c_{{n-1}}t^{{n-1}}+t^{n}~
+\end{aligned}
+$$
+
+
+$$\begin{aligned}
+C(p)={\begin{bmatrix}0&0&\dots &0&-c_{0}\\1&0&\dots &0&-c_{1}\\0&1&\dots &0&-c_{2}\\\vdots &\vdots &\ddots &\vdots &\vdots \\0&0&\dots &1&-c_{{n-1}}\end{bmatrix}}.
+\end{aligned}\\
+\\$$
+Por lo tanto la matriz de compañia del polinomio caracteristico ***$P(\lambda)=\lambda^4{`r c1`}\lambda^3{`r c2`}\lambda^2+{`r c3`}\lambda+{`r c4`}$***, sera la siguiente:
+
+
+$$\begin{aligned}
+C(p)={\begin{bmatrix}0&0&0&{`r c4*-1`}\\1&0&0&{`r c3*-1`}\\0&1&0&{`r c2*-1`}\\0&0&1&{`r c1*-1`}\end{bmatrix}}.
+\end{aligned}
+$$
+
