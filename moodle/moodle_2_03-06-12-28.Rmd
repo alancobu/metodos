@@ -1,0 +1,210 @@
+---
+title: "moodle_2_03-06-12-28"
+author: "Alan Coila Bustinza"
+date: '2022-06-02'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-02_170205.png"
+include_graphics(img1_path)
+```
+```{r}
+
+x1 <- c(0,1/4,1/2,3/4,1,5/4,3/2)
+y1 <- c(3.466,3.474,3.481,3.489,3.497,3.504,3.512)
+
+
+polyinterp=function(x,y){
+  if(length(x)!=length(y))
+    stop ("La longitud de los vectores x e y debe ser la misma" )
+  n=length(x)-1
+  vandermonde=rep(1,length(x))
+  for(i in 1:n)
+  {
+    xi=x^i
+    vandermonde=cbind(vandermonde,xi)
+  }
+  beta=solve(vandermonde,y, tol=1e-22)
+  names(beta)=NULL
+  return(beta)
+}
+
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+
+simp=function(x,y)
+{ 
+  m <- length(x)-1
+  a <- x[1]
+  b <- x[m+1]
+  cof <- polyinterp(x,y)
+  x.ends=seq(a,b,length.out=m+1)
+  y.ends=myeval(x.ends,cof)
+  x.mids=(x.ends[2:(m+1)]-x.ends[1:m])/2+x.ends[1:m] 
+  y.mids=myeval(x.mids,cof)
+  p.area=sum(y.ends[2:(m+1)]+4*y.mids [1: m ]+y.ends[1:m])
+  p.area=p.area * abs(b - a) / (6 * m)
+  return(p.area)
+}
+
+
+simp(x1,y1)
+
+```
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-03_090151.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x <- c(0,2,5,6,8)
+
+Lx <- function(x){
+  n <- length(x)
+  mult <- function(a,b){
+    k <- outer(a,b)
+    u <- as.vector(tapply(k, row(k) + col(k), sum))
+    return(u)
+  }
+  for(i in 1:n){
+    f <- c(1)
+    m <- c(1)
+    for(j in 1:n){
+      if(i!=j){
+        tn <- c(-x[j],1)
+        f <- mult(f,tn)
+        
+      # }
+      # if(j<n+1){
+        
+        v <- x[i]-x[j]
+        # print(cbind(x[i],x[j]))
+        if(v!=0){
+          m <- prod(m,v)
+        }
+      }
+    }
+    
+    print('.......................')
+    print(f)
+    print(m)
+  }
+}
+Lx(x)
+```
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-03_114534.png"
+include_graphics(img1_path)
+```
+```{r}
+x3 <- c(1,2,4,5,8)
+y3 <- c(10,5,2,4,14)
+
+dif_n <- function(x,y){
+  k=length(x)
+  nk <- function(x,y){
+    mat <- matrix(0, length(x), length(x))
+    mat[,1] <- y
+    return (mat)
+  }
+  mat <- nk(x,y)
+  val=1
+  for(i in 1:k){
+    vect=c()
+    for(j in 1:(k-i)){
+      if(j>0){
+        a=mat[j+1,i]
+        b=mat[j,i]
+        vect <- c(vect ,(a-b)/(x[j+val]-x[j]))
+  
+      }
+    }
+    val=val+1
+    if(i<k){
+      mat[,i+1] <- vect[1:k]
+    }
+  }
+
+return(list(mat,k-1))
+}
+dif_n(x3,y3) # retorna la matriz de diferencias divididas y el grado del polinomio
+22
+```
+
+## pregunta 4
+
+```{r}
+img1_path <- "p4_2022-06-03_120503.png"
+include_graphics(img1_path)
+```
+```{r}
+
+x3 <- c(0,5/36,1/3,1/2,23/36,13/18)
+y3 <- c(2.773,2.841,2.933,3.008,3.069,3.165)
+
+polyinterp=function(x,y)
+{
+  # comprobamos que la longitud de los vectores sea la misma
+  if(length(x)!=length(y))
+    stop ("La longitud de los vectores x e y debe ser la misma" )
+  # calculamos el valor de n que es el grado del polinomio
+  # a partir del numero de puntos menos 1
+  n=length(x)-1
+  # creamos la primera columna de la matriz de vandermonde
+  vandermonde=rep(1,length(x))
+  # iteramos para ir agregando las columnas siguientes según
+  # el grado del polinomio
+  for(i in 1:n)
+  {
+    # la matriz contiene columnas sucesivas de los valores de x
+    # elevados a la nth potencia
+    xi=x^i
+    vandermonde=cbind(vandermonde,xi)
+  }
+  # resolvemos el sistema de ecuaciones
+  beta=solve(vandermonde,y, tol=1e-22)
+  # borramos los nombres de las columnas (xi)
+  names(beta)=NULL
+  # nos retorna los coeficientes del polinomio
+  return(beta)
+}
+
+coef <- polyinterp(x3,y3)
+horner=function(x,coefs)
+  # esta función auxiliar recibe los argumentos:
+  #       x     :     puntos a evaluar 
+  #       coefs :     los coeficientes del polinomio
+{
+  y=rep(0,length(x))
+  for(i in length(coefs):1)
+    y=coefs[i]+x*y
+  
+  return(y)
+}
+coef
+horner(5/9,coef)
+
+
+
+```

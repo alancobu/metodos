@@ -1,0 +1,80 @@
+---
+title: "moodle_1_05-06-12-22"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_122322.png"
+include_graphics(img1_path)
+```
+
+
+
+```{r}
+img1_path <- "calc1_2022-06-05_122722.png"
+include_graphics(img1_path)
+```
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-05_123806.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+vA <- c(3,-12,10,-48)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+U%*%L
+
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p4_2022-06-05_123953.png"
+include_graphics(img1_path)
+```
+```{r}
+library('pracma')
+Am <- matrix(c(1,4,4,1,1,-1,3,-4,-3,2,1,-4,1,-3,4,-1),4,4,byrow=TRUE)  
+b <- c(-3,2,-2,1)
+D <- diag(diag(Am))
+L <- -tril(Am,-1)
+U <- -triu(Am,1)
+M <- D-L
+G <- inv(M)%*%U
+d <- inv(M)%*%b
+
+# J <- inv(D)%*%(Lm+Um)
+# c <- inv(D)%*%b
+
+# max(abs(eigen(G)$values))
+
+x0 <- rep(0,length(diag(Am)))
+
+# sol_J = itersolve(Am, b, x0, nmax=1,tol = 1e-6, method = "Jacobi")
+
+sol_G = itersolve(Am, b, x0, nmax=3,tol = 1e-6, method = "Gauss-Seidel")
+sol_G$x
+```

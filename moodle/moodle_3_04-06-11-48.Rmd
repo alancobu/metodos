@@ -1,0 +1,168 @@
+---
+title: "moodle_3_04-06-11-48"
+author: "Alan Coila Bustinza"
+date: '2022-06-04'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-04_115700.png"
+include_graphics(img1_path)
+```
+```{r}
+## ATENTO A Q ESTA PIDIENDO, PUEDES CONFUNDIR C0 C1 C2 CON COEFICIENTS DE LAS ECUACIONES NORMALES
+## O CON LOS DE LA REGRESION
+
+
+x1 <- c(0,3,5,7,10)
+y1 <- c(-1,4,5,-4,-3)
+grado <- 2
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+mypolyfit(x1,y1,grado)
+```
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-04_120024.png"
+include_graphics(img1_path)
+```
+```{r}
+## lo mismo que en la anterior el mismo error
+
+x2 <- c(0,3,6,9,11)
+y2 <- c(-1,-3,-5,0,-1)
+grado <- 1
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+mypolyfit(x2,y2,grado)
+```
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-04_120121.png"
+include_graphics(img1_path)
+```
+```{r}
+x3 <- c(1,2,5,6,8)
+y3 <- c(5,9,20,13,5)
+grado=1
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+cof <- mypolyfit(x3,y3,grado)
+myeval(20,cof)
+```
+
+## pregunta 4
+
+```{r}
+img1_path <- "p4_2022-06-04_120235.png"
+include_graphics(img1_path)
+```
+```{r}
+
+x4 <- c(1,3,5,6,9)
+y4 <- c(19,2,19,14,6)
+grado=1
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+cof <- mypolyfit(x4,y4,grado)
+cof
+## VEMOS QUE LA PENDIENTE ES NEGATIVA POR LO QUE LOS VALORES IRAN EN DISMINUCION
+
+```

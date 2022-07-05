@@ -1,0 +1,170 @@
+---
+title: "moodle_2_02-06-10-05"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p_1.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x <- c(0,1,4,5)
+y <- c(4,4.432,-1.751,-1.604)
+
+vander <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i
+  }
+  return(Phi)
+}
+vander(x,3)
+lag_c <- function(x,y){
+  m <- vander(x,length(x)-1)
+  return(solve(m)%*%y)
+}
+
+coeficientes <- lag_c(x,y)
+coeficientes
+```
+
+
+## pregunta 2
+
+
+```{r}
+img1_path <- "p2_2022-06-02_124403.png"
+include_graphics(img1_path)
+```
+
+```{r}
+is.even <- function(x) x %% 2 == 0
+value <- function(A,x,y){
+  # poner en par = TRUE  si la posicion es par comenzando desde 0 !!!! 
+  u <- 2
+  m <- length(y)-1
+  p_i <- is.even(which(y==0))
+  if(p_i){
+    u <- 4
+  }
+  x_4 <- sum(y[seq(2, m, 2)][1:((m+1)/2)])
+  x_2 <- sum(y[seq(1, m, 2)][2:(m/2)])
+  ar <- A*3*m/(x[m+1]-x[1])
+  f <- y[1]+y[m+1]+4*x_4+2*x_2
+  a <- (ar-f)/u
+  return(a)
+}
+
+Area=48.724
+z=0
+x1 <- c(0,1/4,1/2,3/4,1,5/4,3/2)
+y1 <- c(32.189,32.288,z,32.484,32.581,32.677,32.771)
+value(Area,x1,y1)
+
+```
+## pregunta 3
+```{r}
+img1_path <- "p3_3.png"
+include_graphics(img1_path)
+```
+de momento resuelta mediante los puntos que no incluyen "a" y con ellos la obtencion del polinomio mediante la funcion polyinterpy llevalor a calcme
+```{r}
+
+x2 <- c(0,1/18,1/12,1/4,4/9,5/9)
+y2 <- c(2.197,2.234,2.252,2.357,2.474,2.537)
+polyinterp=function(x,y)
+{
+  # comprobamos que la longitud de los vectores sea la misma
+  if(length(x)!=length(y))
+    stop ("La longitud de los vectores x e y debe ser la misma" )
+  # calculamos el valor de n que es el grado del polinomio
+  # a partir del numero de puntos menos 1
+  n=length(x)-1
+  # creamos la primera columna de la matriz de vandermonde
+  vandermonde=rep(1,length(x))
+  # iteramos para ir agregando las columnas siguientes según
+  # el grado del polinomio
+  for(i in 1:n)
+  {
+    # la matriz contiene columnas sucesivas de los valores de x
+    # elevados a la nth potencia
+    xi=x^i
+    vandermonde=cbind(vandermonde,xi)
+  }
+  # resolvemos el sistema de ecuaciones
+  beta=solve(vandermonde,y, tol=1e-22)
+  # borramos los nombres de las columnas (xi)
+  names(beta)=NULL
+  # nos retorna los coeficientes del polinomio
+  return(beta)
+}
+cof <- polyinterp(x2,y2)
+
+```
+
+## pregunta 4
+
+```{r}
+x2 <- c(1,2,4,5)
+y2 <- c(-5/4,-29/16,-509/256,-2045/1024)
+
+polyinterp=function(x,y)
+{
+  # comprobamos que la longitud de los vectores sea la misma
+  if(length(x)!=length(y))
+    stop ("La longitud de los vectores x e y debe ser la misma" )
+  # calculamos el valor de n que es el grado del polinomio
+  # a partir del numero de puntos menos 1
+  n=length(x)-1
+  # creamos la primera columna de la matriz de vandermonde
+  vandermonde=rep(1,length(x))
+  # iteramos para ir agregando las columnas siguientes según
+  # el grado del polinomio
+  for(i in 1:n)
+  {
+    # la matriz contiene columnas sucesivas de los valores de x
+    # elevados a la nth potencia
+    xi=x^i
+    vandermonde=cbind(vandermonde,xi)
+  }
+  # resolvemos el sistema de ecuaciones
+  beta=solve(vandermonde,y, tol=1e-22)
+  # borramos los nombres de las columnas (xi)
+  names(beta)=NULL
+  # nos retorna los coeficientes del polinomio
+  return(beta)
+}
+
+cof <- polyinterp(x2,y2)
+
+
+horner=function(x,coefs)
+  # esta función auxiliar recibe los argumentos:
+  #       x     :     puntos a evaluar 
+  #       coefs :     los coeficientes del polinomio
+{
+  y=rep(0,length(x))
+  for(i in length(coefs):1)
+    y=coefs[i]+x*y
+  
+  return(y)
+}
+func3 <- function(x){
+  return(3*2**(-2*x)-2)
+}
+
+p <- horner(10,cof)
+r <- func3(10)
+
+abs(r-p)
+```

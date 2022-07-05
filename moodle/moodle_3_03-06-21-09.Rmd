@@ -1,0 +1,145 @@
+---
+title: "moodle_3_03-06-21-09"
+author: "Alan Coila Bustinza"
+date: '2022-06-03'
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-03_203236.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x1 <- c(0,3,4,7,8)
+y1 <- c(-1,0,3,4,4)
+grado <- 1 # ya que es lineal y=c1x+c0
+
+
+# rellenar todos!!!
+
+
+reg <- function(x,y,g){
+  grado=g
+  n=grado+1
+  m1 <- matrix(0,n,n)
+  m2 <- matrix(0,n)
+  for(i in 1:n){
+    for(j in 1:n){
+      m1[i,j]=sum(x**(i+j-2))
+      
+    }
+    m2[i] <- sum(x**(i-1)*y)
+    
+  }
+  return(list(m1,m2,solve(m1,m2)))
+  
+  
+}
+## cuidado con la respuesta debe estar entre corchetes y separado de la coma ,
+## con los Cx puestos correctamente sin espacios
+
+reg(x1,y1,grado)
+# devuelve :
+# 1: la matriz A
+# 2: la matriz B
+# 3: los coeficientes de la regresion
+
+
+```
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-03_204151.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x2 <- c(0,3,5,6,7)
+y2 <- c(-1,1,3,-5,2)
+
+reg <- function(x,y,g){
+  grado=g
+  n=grado+1
+  m1 <- matrix(0,n,n)
+  m2 <- matrix(0,n)
+  for(i in 1:n){
+    for(j in 1:n){
+      m1[i,j]=sum(x**(i+j-2))
+      
+    }
+    m2[i] <- sum(x**(i-1)*y)
+    
+  }
+  return(list(m1,m2,solve(m1,m2)))
+  
+  
+}
+reg(x2,y2,1)
+# devuelve :
+# 1: la matriz A
+# 2: la matriz B
+# 3: los coeficientes de la regresion
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-03_204427.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x3 <- c(1,4,5,7,9)
+y3 <- c(1,7,9,2,13)
+
+reg <- function(x,y,g){
+  grado=g
+  n=grado+1
+  m1 <- matrix(0,n,n)
+  m2 <- matrix(0,n)
+  for(i in 1:n){
+    for(j in 1:n){
+      m1[i,j]=sum(x**(i+j-2))
+      
+    }
+    m2[i] <- sum(x**(i-1)*y)
+    
+  }
+  return(list(m1,m2,solve(m1,m2)))
+  
+  
+}
+reg(x3,y3,1)
+# devuelve :
+# 1: la matriz A
+# 2: la matriz B
+# 3: los coeficientes de la regresion
+```
+
+
+
+## pregunta 4
+
+```{r}
+img1_path <- "p4_2022-06-03_205248.png"
+include_graphics(img1_path)
+
+```
+```{r}
+x4 <- c(1,3,6,9,11)
+y4 <- c(1,16,3,1,2)
+
+cov(x4,y4)
+
+```

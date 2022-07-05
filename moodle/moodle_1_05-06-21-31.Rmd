@@ -1,0 +1,85 @@
+---
+title: "moodle_1_05-06-21-31"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_213421.png"
+include_graphics(img1_path)
+``` 
+
+```{r}
+img1_path <- "cp1_2022-06-05_213514.png"
+include_graphics(img1_path)
+```
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-05_213558.png"
+include_graphics(img1_path)
+``` 
+```{r}
+library('pracma')
+vA <- c(-7,28,4,-22)
+b <- c(2,-2)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+inv(L)%*%b
+
+```
+
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-05_213712.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+Am <- matrix(c(-1,-5,4,-4,-5,4,4,-4,4,0,-3,5,4,-2,-4,-1),4,4,byrow=TRUE)  
+b <- c(4,-4,0,3)
+
+iter <- 3
+## CAMBIA LA MATRIX Y EL VECTOR b !!!!!! <----------!!!!
+
+
+
+# D <- diag(diag(Am))
+# L <- -tril(Am,-1)
+# U <- -triu(Am,1)
+# M <- D-L
+# G <- inv(M)%*%U
+# d <- inv(M)%*%b
+# 
+# J <- inv(D)%*%(Lm+Um)
+# c <- inv(D)%*%b
+# c
+# max(abs(eigen(G)$values))
+x0 <- rep(0,length(diag(Am)))
+x0
+sol_J = itersolve(Am, b, x0, nmax=iter,tol = 1e-6, method = "Jacobi")
+# sol_G = itersolve(Am, b, x0, nmax=iter,tol = 1e-6, method = "Gauss-Seidel")
+sol_J$x  
+```

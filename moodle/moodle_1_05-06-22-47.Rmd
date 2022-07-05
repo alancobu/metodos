@@ -1,0 +1,69 @@
+---
+title: "moodle_1_05-06-22-47"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_224641.png"
+include_graphics(img1_path)
+```
+
+
+```{r}
+library('pracma')
+vA <- c(-1,-10,4,34)
+b <- c(-3,2)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+inv(L)%*%b
+
+```
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-05_225018.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+vA <- c(-7,-28,-7,-35)
+b <- c(-1,0)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+L
+```
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-05_225102.png"
+include_graphics(img1_path)
+```
+
+```{r}
+img1_path <- "cp3_2022-06-05_225146.png"
+include_graphics(img1_path)
+```

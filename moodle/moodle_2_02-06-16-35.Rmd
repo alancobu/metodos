@@ -1,0 +1,139 @@
+---
+title: "moodle_2_02-06-16-35"
+author: "Alan Coila Bustinza"
+date: '2022-06-02'
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-02_153509.png"
+include_graphics(img1_path)
+```
+```{r}
+x1 <- c(0,3,5,6)
+y1 <- c(-5,9.5,-2.345,-11.72)
+n <- length(x1)-1
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i 
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) 
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) 
+  c <- mylssolve(Phi, y) 
+  return(c)
+}
+coef <- mypolyfit(x1,y1,n)
+
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+myeval(7,coef)
+```
+## pregunta 2
+```{r}
+img1_path <- "p2_2022-06-02_160627.png"
+include_graphics(img1_path)
+```
+```{r}
+is.even <- function(x) x %% 2 == 0
+value <- function(A,x,y){
+  # poner en par = TRUE  si la posicion es par comenzando desde 0 !!!! 
+  u <- 2
+  m <- length(y)-1
+  p_i <- is.even(which(y==0))
+  if(p_i){
+    u <- 4
+  }
+  x_4 <- sum(y[seq(2, m, 2)][1:((m+1)/2)])
+  x_2 <- sum(y[seq(1, m, 2)][2:(m/2)])
+  ar <- A*3*m/(x[m+1]-x[1])
+  f <- y[1]+y[m+1]+4*x_4+2*x_2
+  a <- (ar-f)/u
+  return(a)
+}
+Area=28.878
+z=0
+x2 <- c(0,1/4,1/2,3/4,1,5/4,3/2)
+y2 <- c(19.068,19.130,z,19.253,19.313,19.373,19.432)
+
+value(Area,x2,y2)
+
+```
+
+## pregunta 3
+```{r}
+img1_path <- "p3_2022-06-02_162949.png"
+include_graphics(img1_path)
+```
+
+```{r}
+f3 <- function(x){
+  res <- 5*log((x+7),10)
+}
+
+trap3=function(f,a,b,m)
+{
+  x=seq(a,b,length.out=m+1)
+  
+  y=f(x)
+  p.area=sum((y[2:(m+1)]+y[1:m]))
+  p.area=p.area*abs(b-a)/(2*m)
+  return(p.area)
+}
+trap3(f3,0,1,10)
+
+```
+## pregunta 4
+```{r}
+img1_path <- "p4_2022-06-02_163244.png"
+include_graphics(img1_path)
+```
+
+```{r}
+
+vandermonde=function(x)
+{
+  n=length(x)-1
+  # creamos la primera columna de la matriz de vandermonde
+  vandermonde=rep(1,length(x))
+  # iteramos para ir agregando las columnas siguientes según
+  # el grado del polinomio
+  for(i in 1:n)
+  {
+    # la matriz contiene columnas sucesivas de los valores de x
+    # elevados a la nth potencia
+    xi=x^i
+    vandermonde=cbind(vandermonde,xi)
+  }
+  # resolvemos el sistema de ecuaciones
+  beta=vandermonde
+  # borramos los nombres de las columnas (xi)
+  names(beta)=NULL
+  # nos retorna los coeficientes del polinomio
+  return(beta)
+}
+x4 <-c(-5,-3,2,5,7)
+det(vandermonde(x4))
+```
+

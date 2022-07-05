@@ -1,0 +1,72 @@
+---
+title: "moodle_1_05-06-12-53"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_125719.png"
+include_graphics(img1_path)
+```
+
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-05_125832.png"
+include_graphics(img1_path)
+```
+```{r}
+img1_path <- "calcp2_2022-06-05_125955.png"
+include_graphics(img1_path)
+```
+
+
+## Pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-05_130052.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+Am <- matrix(c(-3,-3,3,0,4,-4,-5,-1,-1,2,-4,-4,2,-5,-1,-2),4,4,byrow=TRUE)  
+b <- c(3,1,5,-3)
+iter <- 3
+## CAMBIA LA MATRIX Y EL VECTOR b !!!!!! <----------!!!!
+
+
+# D <- diag(diag(Am))
+# L <- -tril(Am,-1)
+# U <- -triu(Am,1)
+# M <- D-L
+# G <- inv(M)%*%U
+# d <- inv(M)%*%b
+# 
+# J <- inv(D)%*%(Lm+Um)
+# c <- inv(D)%*%b
+# c
+# max(abs(eigen(G)$values))
+x0 <- rep(0,length(diag(Am)))
+x0
+sol_J = itersolve(Am, b, x0, nmax=iter,tol = 1e-6, method = "Jacobi")
+# sol_G = itersolve(Am, b, x0, nmax=iter,tol = 1e-6, method = "Gauss-Seidel")
+sol_J$x 
+
+```
+

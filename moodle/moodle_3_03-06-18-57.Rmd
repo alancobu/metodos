@@ -1,0 +1,135 @@
+---
+title: "moodle_3_03-06-18-57"
+author: "Alan Coila Bustinza"
+date: '2022-06-03'
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-03_191047.png"
+include_graphics(img1_path)
+```
+```{r}
+img1_path <- "p1_2022-06-03_191817.png"
+include_graphics(img1_path)
+```
+
+
+```{r}
+a <- 3
+x <- c(0,2,4,5,6)
+y <- c(-1,4,a,-3,-4)
+
+elm <- c(length((x)),sum(x),sum(x**2),sum(x),sum(x**2),sum(x**3),sum(x**2),sum(x**3),sum(x**4))
+A <- matrix(elm,3,3)
+B <- c(sum(y),sum(x*y),sum(x**2*y))
+solve(A,B)
+A
+
+```
+
+## Pregunta 2
+```{r}
+img1_path <- "p2_2022-06-03_191952.png"
+include_graphics(img1_path)
+```
+
+## Pregunta 3
+```{r}
+img1_path <- "p3_2022-06-03_192044.png"
+include_graphics(img1_path)
+```
+```{r}
+x3 <- c(1,4,6,9,12)
+y3_1 <- c(11,20,7,4,1)
+y3_2 <- c(5,13,4,15,11)
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+```
+```{r}
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+diaA <- myeval(20,mypolyfit(x3,y3_1,1))
+diaB <- myeval(20,mypolyfit(x3,y3_2,1))
+print(paste('dia_A: ',diaA,' dia_B: ',diaB))
+```
+
+## Pregunta 4
+```{r}
+img1_path <- "p4_2022-06-03_192730.png"
+include_graphics(img1_path)
+```
+
+```{r}
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+x <- c(1,2,5,7,8)
+y1 <- c(14,10,19,8,16)
+y2 <- c(5,13,4,15,11)
+
+
+st <- function(x,y){
+  m <- length(x)-2
+  cof <- mypolyfit(x,y,1)
+  e <- y-myeval(x,cof)
+  y_yi2 <- e**2
+  s <- sum(y_yi2)
+  s_t <- sqrt(s/(m-2))
+  return(s_t)
+}
+print(paste('desv st 1: ',st(x,y1),'desv st 2: ',st(x,y2)))
+```

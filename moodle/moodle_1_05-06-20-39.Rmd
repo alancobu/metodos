@@ -1,0 +1,49 @@
+---
+title: "moodle_1_05-06-20-39"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_204115.png"
+include_graphics(img1_path)
+```
+```{r}
+img1_path <- "cp1_2022-06-05_204710.png"
+include_graphics(img1_path)
+```
+
+## pregunta 2
+
+```{r}
+img1_path <- "cp2_2022-06-05_205108.png"
+include_graphics(img1_path)
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-05_205133.png"
+include_graphics(img1_path)
+```
+
+```{r}
+img1_path <- "cp3_2022-06-05_205533.png"
+include_graphics(img1_path)
+```
+
+

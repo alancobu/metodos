@@ -1,0 +1,156 @@
+---
+title: "moodle_3_04-06-13-05"
+author: "Alan Coila Bustinza"
+date: '2022-06-04'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-04_130559.png"
+include_graphics(img1_path)
+```
+```{r}
+x1 <- c(0,1,4,7,8)
+y1 <- c(-1,1,-1,0,-2)
+grado <- 2
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+ec_normal <- function(x,y,n){
+  A <- myPhi(x,n)
+  B <- t(A)%*%A
+  C <- t(A)%*%y
+  return (cbind(B,C))
+  
+}
+ec_normal(x1,y1,grado)
+
+```
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-04_130751.png"
+include_graphics(img1_path)
+```
+
+
+```{r}
+a <- 0
+
+## sum(y) = -1+3+alfa-1+3 = 8
+y <- c(-1,3,a,-1,3)
+8-sum(y)
+
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-04_131028.png"
+include_graphics(img1_path)
+```
+```{r}
+x3 <- c(1,2,3,4,7)
+y3_A<- c(16,4,7,20,12)
+y3_B <- c(3,4,19,4,14)
+grado=1 # usualment las comparacions son lineales
+
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+vs_ttos <-function(x,y_a,y_b,grado){
+  cof_A <- mypolyfit(x,y_a,grado)
+  cof_B <- mypolyfit(x,y_b,grado)
+  e_A <- myeval(20,cof_A)
+  e_B <- myeval(20,cof_B)
+  R <-   paste(' A al dia 20--->:',e_A,' B al dia 20-->',e_B,'  pendiente de A:',cof_A[2],'  pendiente de B:',cof_B[2],sep="\n")
+  return(cat(R))
+}
+vs_ttos(x3,y3_A,y3_B,grado)
+
+```
+
+## pregunta 4
+
+```{r}
+img1_path <- "p4_2022-06-04_131143.png"
+include_graphics(img1_path)
+```
+```{r}
+x4 <- c(1,2,5,7,9)
+y4 <- c(11,19,4,9,19)
+grado=1 # usualment las comparacions son lineales
+
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+mypolyfit(x4,y4,grado)
+```
+
+
+

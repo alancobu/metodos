@@ -1,0 +1,85 @@
+---
+title: "moodle_01_05-06-22-19"
+author: "Alan Coila Bustinza"
+date: '2022-06-05'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-05_222231.png"
+include_graphics(img1_path)
+``` 
+```{r}
+library('pracma')
+vA <- c(-10,-40,-5,-12)
+b <- c(6,-2)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+U%*%L
+```
+
+## pregunta 2
+```{r}
+img1_path <- "p2_2022-06-05_222355.png"
+include_graphics(img1_path)
+``` 
+
+```{r}
+img1_path <- "cp2_2022-06-05_222431.png"
+include_graphics(img1_path)
+``` 
+
+## pregunta 3
+```{r}
+img1_path <- "p3_2022-06-05_222814.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+
+iter <- 1
+
+l1 <- c(4,-2,1)
+l2 <- c(1,2,3)
+l3 <- c(-1,3,3)
+## CAMBIA LA MATRIX, LA ITERACION Y  EL VECTOR b !!!!!! <----------!!!!
+b <- c(3,6,5)
+
+v_horiz <- c(l1,l3,l2)
+v_b <- c(b[1],b[2],b[3])
+
+## mirar si no te dan otro vector inicial que no sea NULO, SINO CAMBIARLO
+v_inicial <- rep(0,length(v_b))
+
+# metodo <- "Gauss-Seidel"
+metodo <- "Jacobi"
+
+err_n0 <- function(vect,b,inicial, iteracion, m){
+  n <- sqrt(length(vect))
+  A <- matrix(vect,n,n,byrow=TRUE)
+  x0 <-inicial
+
+  sol <- itersolve(A, b, x0, nmax=iter,tol = 1e-6, method = m)
+  return(max(sol$x))
+  
+}
+
+err_n0(v_horiz,v_b,v_inicial,iter,metodo)
+
+```

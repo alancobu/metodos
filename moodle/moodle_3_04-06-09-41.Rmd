@@ -1,0 +1,182 @@
+---
+title: "moodle_3_04-06-09-41"
+author: "Alan Coila Bustinza"
+date: '2022-06-04'
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-04_095050.png"
+include_graphics(img1_path)
+```
+```{r}
+x1 <- c(0,2,4,5,7)
+
+# de momento le daremos un valor de 0 al dato q piden
+a <- 0
+y1 <- c(-1,-4,a,0,-1)
+
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+A <- myPhi(x1,1)
+
+# ECUACIONES NORMALES : LO VALORES DE LOS COEFICIENTES SON
+
+## t(A)%*%A
+
+# ECUACIONES NORMALES : LO VALORES DE LOS LOS TERMINOS = ? SON
+
+## t(A)%*%y1
+
+print(cbind(t(A)%*%A,t(A)%*%y1))
+
+# tambien se pueden hallar haciendo la sumatoria de la forma que
+#   1er termino: sum(y)
+#   2do termino: sum(x*y)
+#   3er termino: sum(x**2*y)
+
+# por lo tanto
+
+# sum(y) <- -1-4+a+0-1=-4
+a <- -4+4+1+0+1
+a
+```
+
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-04_100819.png"
+include_graphics(img1_path)
+```
+```{r}
+x2 <- c(0,3,5,7,8)
+y2 <- c(-1,-1,2,0,5)
+
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+A <- myPhi(x2,1)
+
+# ECUACIONES NORMALES : LO VALORES DE LOS COEFICIENTES SON 
+
+#   t(A)%*%A
+
+# ECUACIONES NORMALES : LO VALORES DE LOS LOS TERMINOS = ? SON
+
+#   t(A)%*%y2
+
+print(cbind(t(A)%*%A,t(A)%*%y2))
+
+
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p2_2022-06-04_100018.png"
+include_graphics(img1_path)
+```
+
+```{r}
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+myeval <- function(x, c) {
+  f <- 0
+  for (i in 1:length(c)) {
+    f <- f + c[i] * x^(i - 1) 
+  }
+  return(f)
+}
+
+x2 <- c(1,4,6,9,12)
+y2_A <- c(12,7,18,17,13)
+y2_B <- c(1,12,18,1,2)
+
+cof_A<- mypolyfit(x2,y2_A,1)
+r_A <- myeval(20,cof_A)
+
+
+cof_B <- mypolyfit(x2,y2_B,1)
+r_B <- myeval(20,cof_B)
+print(paste('resultado de A la dia 20 ',r_A,'resultado de B la dia 20 ',r_B))
+
+```
+
+
+## pregunta 4
+
+```{r}
+img1_path <- "p4_2022-06-04_101135.png"
+include_graphics(img1_path)
+```
+
+```{r}
+x4 <- c(1,2,3,4,7)
+y4 <- c(9,14,6,4,13)
+grado <-  1 ## lineal
+## CAMBIAR AMBOS VALORES NO LO OLVIDES
+
+
+myPhi <- function(x, n) {
+  Phi <- matrix(1, length(x), n + 1)
+  for (i in 1:n) {
+    Phi[, i + 1] <- x^i # funciones base para el ajuste polinómico, segun el grado
+  }
+  return(Phi)
+}
+
+mylssolve <- function(A, y) {
+  AT <- t(A) 
+  return((solve(AT %*% A)) %*% AT %*% y) # la función solve nos devuelve la inversa de la matriz
+}
+
+mypolyfit <- function(x, y, n) {
+  Phi <- myPhi(x, n) # construimos la matriz con myPhi
+  c <- mylssolve(Phi, y) # resolvemos el sistema de ecuaciones normales con la función mylssolve
+  return(c)
+}
+cof <- mypolyfit(x4,y4,grado)
+cof
+```
+

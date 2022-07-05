@@ -1,0 +1,70 @@
+---
+title: "moodle_1_07-06-21-57"
+author: "Alan Coila Bustinza"
+date: '2022-06-07'
+output: html_document
+---
+
+```{r}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library('png') 
+```
+
+
+## pregunta 1
+
+```{r}
+img1_path <- "p1_2022-06-07_215848.png"
+include_graphics(img1_path)
+```
+
+```{r}
+library('pracma')
+vA <- c(8,-24,1,6)
+b <- c(7,10)
+n <- length(vA)/2
+A <- matrix(vA,n,n,byrow=TRUE)
+D <- lu_crout(A)
+L <- D$L
+U <- D$U
+U%*%L
+
+```
+
+## pregunta 2
+
+```{r}
+img1_path <- "p2_2022-06-07_215958.png"
+include_graphics(img1_path)
+```
+
+
+## pregunta 3
+
+```{r}
+img1_path <- "p3_2022-06-07_220031.png"
+include_graphics(img1_path)
+```
+```{r}
+library('pracma')
+Am <- matrix(c(2,4,5,3,2,2,-5,2,2),3,3,byrow=TRUE)  
+b <- c(-2,-4,4)
+
+
+L <- -tril(Am,-1)
+U <- -triu(Am,1)
+
+# para jacobi
+M <- D
+N <- L+U 
+J <- inv(D)%*%(L+U)
+c <- inv(D)%*%b
+## para gauss
+# M <- D-L
+# N <- U
+# G <- inv(M)%*%U
+# d <- inv(M)%*%b
+inv(D)%*%N
+
+```
